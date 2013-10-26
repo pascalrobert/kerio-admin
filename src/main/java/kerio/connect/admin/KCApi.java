@@ -9,6 +9,10 @@ import kerio.connect.admin.Session.AdminInfo;
 import kerio.connect.admin.aliases.AliasListResult;
 import kerio.connect.admin.aliases.AliasTargetListResult;
 import kerio.connect.admin.aliases.Aliases.Alias;
+import kerio.connect.admin.backup.BackupOptions;
+import kerio.connect.admin.backup.BackupSchedule;
+import kerio.connect.admin.backup.BackupSchedule.BackupType;
+import kerio.connect.admin.backup.BackupStatus;
 import kerio.connect.admin.common.ApiApplication;
 import kerio.connect.admin.common.CreateResult;
 import kerio.connect.admin.common.Download;
@@ -29,6 +33,9 @@ import kerio.connect.admin.policies.AccessPolicy.AccessPolicyRule;
 import kerio.connect.admin.policies.AccessPolicy.ServiceTypeInfo;
 import kerio.connect.admin.policies.CreateGroupListResult;
 import kerio.connect.admin.settings.AdvancedOptionsSetting;
+import kerio.connect.admin.settings.AdvancedOptionsSetting.FulltextRebuildStatus;
+import kerio.connect.admin.settings.AdvancedOptionsSetting.FulltextRebuildingCommand;
+import kerio.connect.admin.settings.AdvancedOptionsSetting.UpdateCheckerOptions;
 import kerio.connect.admin.settings.ArchiveOptions;
 import kerio.connect.admin.settings.ServerStatistics;
 import kerio.connect.admin.settings.SignOn;
@@ -38,9 +45,6 @@ import kerio.connect.admin.settings.TechnicalSupport;
 import kerio.connect.admin.settings.TypeExpStatistics;
 import kerio.connect.admin.settings.UserTemplate;
 import kerio.connect.admin.settings.Version;
-import kerio.connect.admin.settings.AdvancedOptionsSetting.FulltextRebuildStatus;
-import kerio.connect.admin.settings.AdvancedOptionsSetting.FulltextRebuildingCommand;
-import kerio.connect.admin.settings.AdvancedOptionsSetting.UpdateCheckerOptions;
 import kerio.connect.admin.users.PublicFolder;
 import kerio.connect.admin.users.User;
 import net.minidev.json.JSONArray;
@@ -1177,6 +1181,42 @@ public class KCApi {
   }
   
   /* end Archives */
+  
+  /* begin Backup */
+  
+  public BackupOptions getBackupOptions() throws JSONRPC2Error, SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    JSONObject result = (JSONObject)executeJSONRPCRequest("Backup.get", "options");
+    BackupOptions options = mapper.readValue(((JSONObject)result).toJSONString(), BackupOptions.class);
+    return options;
+  }
+  
+  public BackupStatus getBackupStatus() throws JSONRPC2Error, SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    JSONObject result = (JSONObject)executeJSONRPCRequest("Backup.getStatus", "status");
+    BackupStatus status = mapper.readValue(((JSONObject)result).toJSONString(), BackupStatus.class);
+    return status;
+  }
+
+  // TODO
+  public ArrayList<BackupSchedule> getScheduleList(SearchQuery query) {
+    return new ArrayList<BackupSchedule>();
+  }
+  
+  // TODO
+  public void setBackupOptions(BackupOptions options) {
+    
+  }
+  
+  // TODO
+  public void setScheduleList(ArrayList<BackupSchedule> options) {
+    
+  }
+  
+  // TODO
+  public void startBackup(BackupType backupType) {
+    
+  }
+  
+  /* end Backup */
 
   public class SessionExpired extends Exception {
     public SessionExpired(String message) {
