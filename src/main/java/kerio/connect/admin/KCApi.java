@@ -29,6 +29,7 @@ import kerio.connect.admin.policies.AccessPolicy.AccessPolicyRule;
 import kerio.connect.admin.policies.AccessPolicy.ServiceTypeInfo;
 import kerio.connect.admin.policies.CreateGroupListResult;
 import kerio.connect.admin.settings.AdvancedOptionsSetting;
+import kerio.connect.admin.settings.ArchiveOptions;
 import kerio.connect.admin.settings.ServerStatistics;
 import kerio.connect.admin.settings.SignOn;
 import kerio.connect.admin.settings.SmtpServerSettings;
@@ -1159,6 +1160,23 @@ public class KCApi {
   }
 
   /* end MailingLists */
+  
+  /* begin Archives */
+  
+  public ArchiveOptions getArchive() throws JSONRPC2Error, SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    JSONObject result = (JSONObject)executeJSONRPCRequest("Archive.get", "options");
+    ArchiveOptions archive = mapper.readValue(((JSONObject)result).toJSONString(), ArchiveOptions.class);
+    return archive;
+  }
+  
+  /*
+   * TODO
+   */
+  public void setArchive(ArchiveOptions options) {
+    
+  }
+  
+  /* end Archives */
 
   public class SessionExpired extends Exception {
     public SessionExpired(String message) {
