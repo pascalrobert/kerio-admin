@@ -273,7 +273,7 @@ public class Domain {
     }
   }
 
-  public class Forwarding {
+  public static class Forwarding {
 
     boolean   isEnabled; // is forwarding enabled? 
     String  host; // hostname or IP address to forward 
@@ -371,7 +371,7 @@ public class Domain {
     }
   }
 
-  public class DirectoryService {
+  public static class DirectoryService {
 
     boolean   isEnabled;
     // directory service is in use / isEnabled must be always assigned if used in set methods 
@@ -450,7 +450,7 @@ public class Domain {
 
   }
   
-  public class DirectoryAuthentication {
+  public static class DirectoryAuthentication {
 
     String  username;
     String  password;
