@@ -14,15 +14,20 @@ import kerio.connect.admin.backup.BackupSchedule;
 import kerio.connect.admin.backup.BackupSchedule.BackupType;
 import kerio.connect.admin.backup.BackupStatus;
 import kerio.connect.admin.certificates.Certificate;
-import kerio.connect.admin.certificates.Certificate.CertificateType;
-import kerio.connect.admin.certificates.Certificate.ValidPeriod;
-import kerio.connect.admin.certificates.CertificateListResult;
 import kerio.connect.admin.common.ApiApplication;
 import kerio.connect.admin.common.CreateResult;
 import kerio.connect.admin.common.Download;
 import kerio.connect.admin.common.Error;
 import kerio.connect.admin.common.NamedValue;
 import kerio.connect.admin.common.SearchQuery;
+import kerio.connect.admin.common.enums.HourOrDay;
+import kerio.connect.admin.content.AntiSpamSetting;
+import kerio.connect.admin.content.AntivirusSetting;
+import kerio.connect.admin.content.AttachmentItem;
+import kerio.connect.admin.content.AttachmentSetting;
+import kerio.connect.admin.content.BlackList;
+import kerio.connect.admin.content.CustomRule;
+import kerio.connect.admin.content.IntegratedAvirUpdateStatus;
 import kerio.connect.admin.domains.Domain;
 import kerio.connect.admin.mailinglists.Ml;
 import kerio.connect.admin.mailinglists.Ml.MlMembership;
@@ -1255,20 +1260,20 @@ public class KCApi {
 
     return certificates;
   }
-  
+
   // TODO
   public String generateRequest(ArrayList<NamedValue> subject) {
     return null;
   }
-  
+
   // TODO
   public String importPrivateKey(String fileId) {
     return null;
   }
-  
+
   // TODO
   public void setActiveCertificate(String id) {
-    
+
   }
 
   // TODO
@@ -1288,7 +1293,7 @@ public class KCApi {
   public Download exportCertificate(String id) throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
     HashMap<String, Object> params = new HashMap<String, Object>();
     params.put("id", id);
-    
+
     JSONObject fileDownload = (JSONObject)executeJSONRPCRequest("ConnectCertificate.exportCertificate", "fileDownload", params);
     Download download = mapper.readValue(fileDownload.toJSONString(), Download.class);
     return download;
@@ -1297,7 +1302,7 @@ public class KCApi {
   public Download exportPrivateKey(String id) throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
     HashMap<String, Object> params = new HashMap<String, Object>();
     params.put("id", id);
-    
+
     JSONObject fileDownload = (JSONObject)executeJSONRPCRequest("ConnectCertificate.exportPrivateKey", "fileDownload", params);
     Download download = mapper.readValue(fileDownload.toJSONString(), Download.class);
     return download;
@@ -1312,6 +1317,165 @@ public class KCApi {
   }
 
   /* end ConnectCertificate */
+
+  /* begin Content */
+
+  // TODO
+  public ArrayList<Error> addBlackLists(ArrayList<BlackList> items) {
+    return new ArrayList<Error>();
+  }
+
+  public AntiSpamSetting getAntiSpamSetting() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    JSONObject settingAsJson = (JSONObject)executeJSONRPCRequest("Content.getAntiSpamSetting", "setting", null);
+    AntiSpamSetting settings = mapper.readValue(settingAsJson.toJSONString(), AntiSpamSetting.class);
+    return settings;
+  }
+
+  public AntivirusSetting getAntivirusSetting() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    JSONObject settingAsJson = (JSONObject)executeJSONRPCRequest("Content.getAntivirusSetting", "setting", null);
+    AntivirusSetting settings = mapper.readValue(settingAsJson.toJSONString(), AntivirusSetting.class);
+    return settings;
+  }
+
+  public ArrayList<AttachmentItem> getAttachmentRules() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
+    ArrayList<AttachmentItem> rules = new ArrayList<AttachmentItem>();
+
+    try {
+      JSONArray arrayAsJSON = (JSONArray)executeJSONRPCRequest("Content.getAttachmentRules", "filterRules", null);
+
+      for (Object ruleAsJson: arrayAsJSON) {
+        if (ruleAsJson instanceof JSONObject) {
+          AttachmentItem rule = mapper.readValue(((JSONObject)ruleAsJson).toJSONString(), AttachmentItem.class);
+          rules.add(rule);
+        }
+      }
+    }
+    catch (JsonParseException e) {
+      e.printStackTrace();
+    }
+    catch (JsonMappingException e) {
+      e.printStackTrace();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return rules;
+  }
+
+  public AttachmentSetting getAttachmentSetting() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    JSONObject settingAsJson = (JSONObject)executeJSONRPCRequest("Content.getAttachmentSetting", "setting", null);
+    AttachmentSetting settings = mapper.readValue(settingAsJson.toJSONString(), AttachmentSetting.class);
+    return settings;
+  }
+
+  public HashMap<String, ArrayList<String>> getAvailableAttachments() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
+    HashMap<String, ArrayList<String>> objects = new HashMap<String, ArrayList<String>>();
+    ArrayList<String> fileNames = new ArrayList<String>();
+    ArrayList<String> mimeTypes = new ArrayList<String>();
+
+    JSONObject result = (JSONObject)executeJSONRPCRequest("Content.getAvailableAttachments", null, null);
+
+    JSONArray fileNamesAsJson = (JSONArray)result.get("fileNames");
+    for (Object fileName: fileNamesAsJson) {
+      fileNames.add((String)fileName);
+    }
+    
+    JSONArray mimeTypesAsJson = (JSONArray)result.get("mimeTypes");
+    for (Object mimeType: mimeTypesAsJson) {
+      mimeTypes.add((String)mimeType);
+    }
+
+    objects.put("fileNames", fileNames);
+    objects.put("mimeTypes", mimeTypes);
+
+    return objects;
+
+  }
+
+  public ArrayList<BlackList> getBlackListList() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
+    ArrayList<BlackList> list = new ArrayList<BlackList>();
+
+    try {
+      JSONArray arrayAsJSON = (JSONArray)executeJSONRPCRequest("Content.getBlackListList", "list", null);
+
+      for (Object blackListAsJson: arrayAsJSON) {
+        if (blackListAsJson instanceof JSONObject) {
+          BlackList blackList = mapper.readValue(((JSONObject)blackListAsJson).toJSONString(), BlackList.class);
+          list.add(blackList);
+        }
+      }
+    }
+    catch (JsonParseException e) {
+      e.printStackTrace();
+    }
+    catch (JsonMappingException e) {
+      e.printStackTrace();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return list;
+  }
+
+  //void getCustomRuleList(out CustomRuleList list, out long totalItems, in kerio::web::SearchQuery query);
+
+  // TODO
+  public ArrayList<Error> removeBlackLists(ArrayList<String> ids) {
+    return new ArrayList<Error>();
+  }
+
+  // TODO
+  public void removeUnusedCustomRules(long number, HourOrDay unit) {
+    
+  }
+  
+  // TODO
+  public void setAntiSpamSetting(AntiSpamSetting setting) {
+   
+  }
+  
+  // TODO
+  public ArrayList<Error> setAntivirusSetting(AntivirusSetting setting) {
+    return new ArrayList<Error>();
+  }
+  
+  // TODO
+  public void setAttachmentRules(ArrayList<AttachmentItem> filterRules) {
+    
+  }
+  
+// TODO
+  public void setAttachmentSetting(AttachmentSetting setting) {
+    
+  }
+  
+  // TODO
+  public ArrayList<Error> setBlackLists(ArrayList<String> ids, BlackList pattern) {
+    return new ArrayList<Error>();
+  }
+  
+  // TODO
+  public void setCustomRuleList(ArrayList<CustomRule> list) {
+    
+  }
+  
+  public void testGreylistConnection() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
+    executeJSONRPCRequest("Content.testGreylistConnection", null, null);
+  }
+  
+  public IntegratedAvirUpdateStatus updateAntivirusStatus() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    JSONObject statusAsJson = (JSONObject)executeJSONRPCRequest("Content.updateAntivirusStatus", "status", null);
+    IntegratedAvirUpdateStatus status = mapper.readValue(statusAsJson.toJSONString(), IntegratedAvirUpdateStatus.class);
+    return status;
+  }
+  
+  public void updateIntegratedAntivirus() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
+    executeJSONRPCRequest("Content.updateIntegratedAntivirus", null, null);
+  }
+
+  /* end Content */
 
   public class SessionExpired extends Exception {
     public SessionExpired(String message) {
