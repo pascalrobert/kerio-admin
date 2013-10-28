@@ -13,10 +13,15 @@ import kerio.connect.admin.backup.BackupOptions;
 import kerio.connect.admin.backup.BackupSchedule;
 import kerio.connect.admin.backup.BackupSchedule.BackupType;
 import kerio.connect.admin.backup.BackupStatus;
+import kerio.connect.admin.certificates.Certificate;
+import kerio.connect.admin.certificates.Certificate.CertificateType;
+import kerio.connect.admin.certificates.Certificate.ValidPeriod;
+import kerio.connect.admin.certificates.CertificateListResult;
 import kerio.connect.admin.common.ApiApplication;
 import kerio.connect.admin.common.CreateResult;
 import kerio.connect.admin.common.Download;
 import kerio.connect.admin.common.Error;
+import kerio.connect.admin.common.NamedValue;
 import kerio.connect.admin.common.SearchQuery;
 import kerio.connect.admin.domains.Domain;
 import kerio.connect.admin.mailinglists.Ml;
@@ -1164,32 +1169,32 @@ public class KCApi {
   }
 
   /* end MailingLists */
-  
+
   /* begin Archives */
-  
+
   public ArchiveOptions getArchive() throws JSONRPC2Error, SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
     JSONObject result = (JSONObject)executeJSONRPCRequest("Archive.get", "options");
     ArchiveOptions archive = mapper.readValue(((JSONObject)result).toJSONString(), ArchiveOptions.class);
     return archive;
   }
-  
+
   /*
    * TODO
    */
   public void setArchive(ArchiveOptions options) {
-    
+
   }
-  
+
   /* end Archives */
-  
+
   /* begin Backup */
-  
+
   public BackupOptions getBackupOptions() throws JSONRPC2Error, SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
     JSONObject result = (JSONObject)executeJSONRPCRequest("Backup.get", "options");
     BackupOptions options = mapper.readValue(((JSONObject)result).toJSONString(), BackupOptions.class);
     return options;
   }
-  
+
   public BackupStatus getBackupStatus() throws JSONRPC2Error, SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
     JSONObject result = (JSONObject)executeJSONRPCRequest("Backup.getStatus", "status");
     BackupStatus status = mapper.readValue(((JSONObject)result).toJSONString(), BackupStatus.class);
@@ -1200,23 +1205,123 @@ public class KCApi {
   public ArrayList<BackupSchedule> getScheduleList(SearchQuery query) {
     return new ArrayList<BackupSchedule>();
   }
-  
+
   // TODO
   public void setBackupOptions(BackupOptions options) {
-    
+
   }
-  
+
   // TODO
   public void setScheduleList(ArrayList<BackupSchedule> options) {
-    
+
   }
-  
+
   // TODO
   public void startBackup(BackupType backupType) {
-    
+
   }
-  
+
   /* end Backup */
+
+  /* begin Certificates */
+
+  public ArrayList<Certificate> getCertificates(SearchQuery query) throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
+    ArrayList<Certificate> certificates = new ArrayList<Certificate>();
+
+    HashMap<String, Object> params = new HashMap<String, Object>();
+    params.put("query", query);
+
+    try {
+      JSONObject result = (JSONObject)executeJSONRPCRequest("ConnectCertificate.get", null, params);
+
+      JSONArray arrayAsJSON = (JSONArray)result.get("certificates");
+
+      for (Object certificatesAsJson: arrayAsJSON) {
+        if (certificatesAsJson instanceof JSONObject) {
+          Certificate certificate = mapper.readValue(((JSONObject)certificatesAsJson).toJSONString(), Certificate.class);
+          certificates.add(certificate);
+        }
+      }
+    }
+    catch (JsonParseException e) {
+      e.printStackTrace();
+    }
+    catch (JsonMappingException e) {
+      e.printStackTrace();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return certificates;
+  }
+
+  // TODO
+  public void setCertificateName(String id, String name) {
+
+  }
+
+  // TODO
+  public ArrayList<Error> remove(ArrayList<String> ids) {
+    return new ArrayList<Error>(); 
+  }
+
+  public String generateCertificate(ArrayList<NamedValue> subject, int yearsValid) throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
+    HashMap<String, Object> params = new HashMap<String, Object>();
+    params.put("subject", subject);
+    params.put("valid", yearsValid);
+
+    JSONObject result = (JSONObject)executeJSONRPCRequest("ConnectCertificate.generate", null, params);
+    return (String)result.get("id");
+  }
+
+  // TODO
+  public ArrayList<NamedValue> getCountryList() {
+    return new ArrayList<NamedValue>();
+  }
+
+  // TODO
+  public String importCertificate(String keyId, String fileId, String name, CertificateType type) {
+    return null;
+  }
+
+  // TODO
+  public String importPrivateKey(boolean needPassword, String fileId) {
+    return null;
+  }
+
+  // TODO
+  public void unlockPrivateKey(String keyId, String password) {
+
+  }
+
+  public Download exportCertificate(String id) throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    HashMap<String, Object> params = new HashMap<String, Object>();
+    params.put("id", id);
+    
+    JSONObject fileDownload = (JSONObject)executeJSONRPCRequest("ConnectCertificate.exportCertificate", "fileDownload", params);
+    Download download = mapper.readValue(fileDownload.toJSONString(), Download.class);
+    return download;
+  }
+
+  public Download exportPrivateKey(String id) throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    HashMap<String, Object> params = new HashMap<String, Object>();
+    params.put("id", id);
+    
+    JSONObject fileDownload = (JSONObject)executeJSONRPCRequest("ConnectCertificate.exportPrivateKey", "fileDownload", params);
+    Download download = mapper.readValue(fileDownload.toJSONString(), Download.class);
+    return download;
+  }
+
+  public String getCertificateAsString(String id) throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    HashMap<String, Object> params = new HashMap<String, Object>();
+    params.put("id", id);
+
+    String source = (String)executeJSONRPCRequest("ConnectCertificate.toSource", "source", params);
+    return source;
+  }
+
+  /* end Certificates */
 
   public class SessionExpired extends Exception {
     public SessionExpired(String message) {
