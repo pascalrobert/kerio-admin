@@ -1223,7 +1223,7 @@ public class KCApi {
 
   /* end Backup */
 
-  /* begin Certificates */
+  /* begin ConnectCertificate */
 
   public ArrayList<Certificate> getCertificates(SearchQuery query) throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
     ArrayList<Certificate> certificates = new ArrayList<Certificate>();
@@ -1255,10 +1255,20 @@ public class KCApi {
 
     return certificates;
   }
-
+  
   // TODO
-  public void setCertificateName(String id, String name) {
-
+  public String generateRequest(ArrayList<NamedValue> subject) {
+    return null;
+  }
+  
+  // TODO
+  public String importPrivateKey(String fileId) {
+    return null;
+  }
+  
+  // TODO
+  public void setActiveCertificate(String id) {
+    
   }
 
   // TODO
@@ -1273,26 +1283,6 @@ public class KCApi {
 
     JSONObject result = (JSONObject)executeJSONRPCRequest("ConnectCertificate.generate", null, params);
     return (String)result.get("id");
-  }
-
-  // TODO
-  public ArrayList<NamedValue> getCountryList() {
-    return new ArrayList<NamedValue>();
-  }
-
-  // TODO
-  public String importCertificate(String keyId, String fileId, String name, CertificateType type) {
-    return null;
-  }
-
-  // TODO
-  public String importPrivateKey(boolean needPassword, String fileId) {
-    return null;
-  }
-
-  // TODO
-  public void unlockPrivateKey(String keyId, String password) {
-
   }
 
   public Download exportCertificate(String id) throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
@@ -1321,7 +1311,7 @@ public class KCApi {
     return source;
   }
 
-  /* end Certificates */
+  /* end ConnectCertificate */
 
   public class SessionExpired extends Exception {
     public SessionExpired(String message) {
