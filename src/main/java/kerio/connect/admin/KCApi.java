@@ -15,6 +15,7 @@ import kerio.connect.admin.backup.BackupSchedule.BackupType;
 import kerio.connect.admin.backup.BackupStatus;
 import kerio.connect.admin.certificates.Certificate;
 import kerio.connect.admin.common.ApiApplication;
+import kerio.connect.admin.common.ClusterError;
 import kerio.connect.admin.common.CreateResult;
 import kerio.connect.admin.common.Download;
 import kerio.connect.admin.common.Error;
@@ -33,7 +34,11 @@ import kerio.connect.admin.delivery.InternetSettings;
 import kerio.connect.admin.delivery.Pop3Account;
 import kerio.connect.admin.delivery.Pop3Sorting;
 import kerio.connect.admin.delivery.ScheduledAction;
+import kerio.connect.admin.domains.CreateDomainListResult;
+import kerio.connect.admin.domains.DirectoryServiceConfiguration;
 import kerio.connect.admin.domains.Domain;
+import kerio.connect.admin.domains.DomainSetting;
+import kerio.connect.admin.domains.UserDomainCountInfo;
 import kerio.connect.admin.mailinglists.Ml;
 import kerio.connect.admin.mailinglists.Ml.MlMembership;
 import kerio.connect.admin.mailinglists.Ml.TrusteeTarget;
@@ -90,7 +95,7 @@ public class KCApi {
     mapper.setSerializationInclusion(Include.NON_NULL);
     mapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
   }
-
+  
   public Domain getDomain() throws JSONRPC2Error, JsonParseException, JsonMappingException, IOException, SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
     JSONObject domainAsJson = (JSONObject)executeJSONRPCRequest("Session.getDomain", "domain");
     Domain domain = mapper.readValue(domainAsJson.toJSONString(), Domain.class);
@@ -142,6 +147,8 @@ public class KCApi {
     return productInfo;
   }
 
+  /* begin Domains */
+  
   public ArrayList<Domain> getDomains() throws JSONRPC2Error, SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
     ArrayList<Domain> domains = new ArrayList<Domain>();
 
@@ -173,6 +180,81 @@ public class KCApi {
     return domains;
   }
 
+  public void checkPublicFoldersIntegrity() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
+    executeJSONRPCRequest("Domains.checkPublicFoldersIntegrity", null, null);
+  }
+  
+  // TODO
+  public CreateDomainListResult createDomain(ArrayList<Domain> domains) {
+    return null;
+  }
+  
+  // TODO 8.2 and later, must check API version
+  public String generateDomainPassword(String domainId) {
+    return null;
+  }
+  
+  // TODO 8.2 and later, must check API version
+  public String getDkimDnsRecord(String domain) {
+    return null;
+  }
+  
+  public DomainSetting getSettingsForAllDomains() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    JSONObject result = (JSONObject)executeJSONRPCRequest("Domains.getSettings", "setting", null);
+    DomainSetting settings = mapper.readValue(((JSONObject)result).toJSONString(), DomainSetting.class);
+    return settings;
+  }
+  
+  public UserDomainCountInfo getUserCountInfo(String domainId) throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    HashMap<String,Object> params = new HashMap<String, Object>();
+    params.put("domainId", domainId);
+    
+    JSONObject result = (JSONObject)executeJSONRPCRequest("Domains.getUserCountInfo", "countInfo", params);
+    UserDomainCountInfo count = mapper.readValue(((JSONObject)result).toJSONString(), UserDomainCountInfo.class);
+    return count;
+  }
+  
+  // TODO
+  public ArrayList<Error> removeDomain(ArrayList<String> domainIds) {
+    return new ArrayList<Error>();
+  }
+  
+  public ClusterError renameDomain(String domainId, String newName) {
+    return null;
+  }
+  
+  // TODO
+  public String saveFooterImage(String fileId) {
+    return null;
+  }
+  
+  // TODO
+  public String saveWebMailLogo(String fileId, String domainId) {
+    return null;
+  }
+  
+  // TODO
+  public ArrayList<Error> setDomain(ArrayList<String> domainIds, Domain pattern) {
+    return new ArrayList<Error>();    
+  }
+
+  // TODO
+  public void setSettingsForAllDomains(DomainSetting setting) {
+    
+  }
+
+  // TODO
+  public ArrayList<Error> testDomainController(ArrayList<String> hostnames, DirectoryServiceConfiguration config, String domainId) {
+    return new ArrayList<Error>();
+  }
+
+  // TODO
+  public ArrayList<Error> testDkimDnsStatus(ArrayList<String> hostnames) {
+    return new ArrayList<Error>();    
+  }
+  
+  /* end Domains */
+  
   public ArrayList<User> getUsers(String[] fields, int limit, String domainId) throws JSONRPC2Error, SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
     ArrayList<User> users = new ArrayList<User>();
 
@@ -1282,7 +1364,7 @@ public class KCApi {
   }
 
   // TODO
-  public ArrayList<Error> remove(ArrayList<String> ids) {
+  public ArrayList<Error> removeCertificate(ArrayList<String> ids) {
     return new ArrayList<Error>(); 
   }
 
