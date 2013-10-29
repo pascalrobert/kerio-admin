@@ -28,6 +28,11 @@ import kerio.connect.admin.content.AttachmentSetting;
 import kerio.connect.admin.content.BlackList;
 import kerio.connect.admin.content.CustomRule;
 import kerio.connect.admin.content.IntegratedAvirUpdateStatus;
+import kerio.connect.admin.delivery.EtrnDownload;
+import kerio.connect.admin.delivery.InternetSettings;
+import kerio.connect.admin.delivery.Pop3Account;
+import kerio.connect.admin.delivery.Pop3Sorting;
+import kerio.connect.admin.delivery.ScheduledAction;
 import kerio.connect.admin.domains.Domain;
 import kerio.connect.admin.mailinglists.Ml;
 import kerio.connect.admin.mailinglists.Ml.MlMembership;
@@ -1476,6 +1481,115 @@ public class KCApi {
   }
 
   /* end Content */
+  
+  /* begin Delivery */
+  
+  // TODO
+  public ArrayList<Error> addEtrnDownloadList(ArrayList<EtrnDownload> downloads) {
+    return new ArrayList<Error>();
+  }
+  
+  // TODO
+  public ArrayList<Error> addPop3AccountList(ArrayList<Pop3Account> accounts) {
+    return new ArrayList<Error>();
+  }
+  
+  // TODO
+  public ArrayList<Error> addPop3SortingList(ArrayList<Pop3Sorting> sortings) {
+    return new ArrayList<Error>();
+  }
+  
+  // TODO
+  public ArrayList<Error> addScheduledActionList(ArrayList<ScheduledAction> actions) {
+    return new ArrayList<Error>();
+  }
+  
+  public void downloadEtrn() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
+    executeJSONRPCRequest("Delivery.downloadEtrn", null, null);
+  }
+  
+  // void getEtrnDownloadList(out EtrnDownloadList list, out long totalItems, in kerio::web::SearchQuery query);
+  public long getEtrnTimeout() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
+    Long seconds = (Long)executeJSONRPCRequest("Delivery.getEtrnTimeout", "seconds", null);
+    return seconds;
+  }
+  
+  public InternetSettings getInternetSettings() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException, JsonParseException, JsonMappingException, IOException {
+    JSONObject statusAsJson = (JSONObject)executeJSONRPCRequest("Delivery.getInternetSettings", "settings", null);
+    InternetSettings settings = mapper.readValue(statusAsJson.toJSONString(), InternetSettings.class); 
+    return settings;
+  }
+  
+  //void getPop3AccountList(out Pop3AccountList list, out long totalItems, in kerio::web::SearchQuery query);
+  //void getPop3SortingList(out Pop3SortingList list, out long totalItems, in kerio::web::SearchQuery query);
+  public ArrayList<String> getRasNames() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
+    ArrayList<String> list = new ArrayList<String>();
+
+    JSONArray arrayAsJSON = (JSONArray)executeJSONRPCRequest("Delivery.getRasNames", "names", null);
+
+    for (Object name: arrayAsJSON) {
+      list.add((String)name);
+    }
+
+    return list;
+  }
+  
+  //void getScheduledActionList(out ScheduledActionList list, out long totalItems, in kerio::web::SearchQuery query);
+  // TODO
+  public ArrayList<Error> removeEtrnDownloadList(ArrayList<String> ids) {
+    return new ArrayList<Error>();
+  }
+  
+  // TODO
+  public ArrayList<Error> removePop3AccountList(ArrayList<String> ids) {
+    return new ArrayList<Error>();
+  }
+  
+  // TODO
+  public ArrayList<Error> removePop3SortingList(ArrayList<String> ids) {
+    return new ArrayList<Error>();
+  }
+  
+  // TODO
+  public ArrayList<Error> removeScheduledActionList(ArrayList<String> ids) {
+    return new ArrayList<Error>();
+  }
+  
+  public void runPop3Downloads() throws SessionExpired, RequestTimeout, InvalidRequest, InvalidParameters, InvalidJSON, RequestTooLarge, ResourceAlreadyExists, ResourceDontExists, Forbidden, GeneralException {
+    executeJSONRPCRequest("Delivery.runPop3Downloads", null, null);
+  }
+  
+  // TODO
+  public void setEtrnDownload(String downloadId, EtrnDownload download) {
+    
+  }
+  
+  // TODO
+  public void setEtrnTimeout(long seconds) {
+    
+  }
+  
+  // TODO
+  public void setInternetSettings(InternetSettings settings) {
+    
+  }
+  
+  // TODO
+  void setPop3Account(String accountId, Pop3Account account) {
+    
+  }
+  
+  // TODO
+  void setPop3Sorting(String sortingId, Pop3Sorting sorting) {
+    
+  }
+  
+  // TODO
+  void setScheduledAction(String actionId, ScheduledAction action) {
+    
+  }
+  
+  /* end Delivery */
 
   public class SessionExpired extends Exception {
     public SessionExpired(String message) {
